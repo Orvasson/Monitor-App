@@ -1,10 +1,10 @@
 # Monitor-App
-Monitor App 
+Monitor App  <br />
 
-Aristotle University of Thessaloniki
-Faculty of Engineering
-Electrical and Computer Engineering 
-
-Thesis: Orestis Vasiniotis 
+Aristotle University of Thessaloniki <br />
+Faculty of Engineering <br />
+Electrical and Computer Engineering  <br />
+<br />
+Thesis: Orestis Vasiniotis <br />
 2021-2022
 
