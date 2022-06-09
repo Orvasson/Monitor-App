@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "813525119919",
+    "project_id": "monitorapp-522fa",
+    "storage_bucket": "monitorapp-522fa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:813525119919:android:1586390fab85c35463f55a",
+        "android_client_info": {
+          "package_name": "com.pentechnologies.wareader2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "813525119919-gj3vsrqgdrq23v25iud694ti19mtj1nb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtqrcQgCHSnsz1WCFAsxVeNE0JkumF5RM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "813525119919-gj3vsrqgdrq23v25iud694ti19mtj1nb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
