@@ -14,12 +14,14 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.CountDownTimer
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import com.pentechnologies.wareader2.MainActivity.Companion.ToastThis
 import com.pentechnologies.wareader2.ble.ConnectionManager
 import com.pentechnologies.wareader2.ble.ConnectionManagerAnkle
 import com.pentechnologies.wareader2.drive.FilesFunctions
@@ -73,6 +75,19 @@ class Initializer private constructor(val mainActivity: MainActivity) {
             /*When a device found check if it is the wrist device
             * then if it is a the wrist device with given MAC connect to that*/
             //if the result mac address is the Wrist device address
+//            object : CountDownTimer(40000, 1000) {
+//
+//                override fun onTick(millisUntilFinished: Long) {
+//                    //do nothing
+//                    Log.i("ConnectionManager", "We are on tick bomb")
+//                }
+//
+//                override fun onFinish() {
+//                    Toast.makeText(ToastThis, "We could not find Wrist Device, We will search for Ankle Device", Toast.LENGTH_LONG).show()
+//                    start2()
+//                }
+//            }.start()
+
             if (result?.device?.address == WRIST_DEVICE_ADDRESS) {
                 //save the device setting on the devWrist
                 devWrist = result.device
@@ -195,6 +210,8 @@ class Initializer private constructor(val mainActivity: MainActivity) {
 
 
     }
+
+
 
     companion object {
 

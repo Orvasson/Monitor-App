@@ -1,17 +1,14 @@
+@file:Suppress("DEPRECATION")
+
 package com.pentechnologies.wareader2
 
 import android.Manifest
 import android.app.ProgressDialog
 import android.bluetooth.BluetoothGatt
-import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
-import android.bluetooth.BluetoothProfile
-import android.bluetooth.BluetoothProfile.GATT
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.os.CountDownTimer
-import android.os.Environment
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -23,29 +20,20 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.OnProgressListener
 import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.UploadTask
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.pentechnologies.wareader2.Utils.createSet
-import com.pentechnologies.wareader2.Utils.getRand
-import com.pentechnologies.wareader2.Utils.getRandH
-import com.pentechnologies.wareader2.Utils.getTime
 import com.pentechnologies.wareader2.Utils.getTodayDate
 import com.pentechnologies.wareader2.Utils.saveToGallery
 import com.pentechnologies.wareader2.ble.AnkleGattCallback
 import com.pentechnologies.wareader2.ble.ConnectionManager
 import com.pentechnologies.wareader2.ble.ConnectionManagerAnkle
 import com.pentechnologies.wareader2.ble.WristGattCallback
-import com.pentechnologies.wareader2.db.Ecg
-import com.pentechnologies.wareader2.db.HeartRate
 import com.pentechnologies.wareader2.db.database.AppDatabase
 import com.pentechnologies.wareader2.db.database.DatabaseBuilder
 import com.pentechnologies.wareader2.drive.FilesFunctions
@@ -58,10 +46,10 @@ import java.util.*
 import kotlin.math.roundToInt
 
 
+@Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
     private val STORAGE_PERMISSION_REQUEST_CODE: Int = 1212
-    private lateinit var initializerW: Initializer //for wrist
-    private lateinit var initializerA: Initializer //for ankle
+
     private lateinit var connectionAnkle: ConnectionManagerAnkle
     private lateinit var connectionWrist: ConnectionManager
 
@@ -74,6 +62,8 @@ class MainActivity : AppCompatActivity() {
     var storageReference: StorageReference? = null
 
     companion object {
+        private lateinit var initializerW: Initializer //for wrist
+        private lateinit var initializerA: Initializer //for ankle
         var flagWrist: Boolean = false
         var flagAnkle: Boolean = false
         lateinit var gattAnkle: BluetoothGatt
@@ -159,7 +149,7 @@ class MainActivity : AppCompatActivity() {
             //save the picture to the DCIM of phone
             val file = saveToGallery(chart!!,"ECG",applicationContext)
             //If picture exists, upload it to Firebase via fileUpload() function
-            if(!file.equals("")){
+            if(file != ""){
                 val progressDialog = ProgressDialog(this)
                 progressDialog.setTitle("Uploading...")
                 progressDialog.show()
@@ -182,10 +172,10 @@ class MainActivity : AppCompatActivity() {
             mainViewModel.fetchHeartRate(appDatabase)
             mainViewModel.fetchAnkle(appDatabase)
             //model with list of data for Wrist dev we got from observer
-            mainViewModel.heart.observe(this, androidx.lifecycle.Observer {
+            mainViewModel.heart.observe(this) {
 
                 val list: List<Map<String, List<*>>> = it as List<Map<String, List<*>>>
-                if (list.size > 0) { //if there is at least one value sent from wrist dev
+                if (list.isNotEmpty()) { //if there is at least one value sent from wrist dev
                     // check through object FilesFunctions if excel was created for Wrist dev
                     val file = if (FilesFunctions.isTodayFileExists(this)) {
                         FilesFunctions.todayFile(this)
@@ -195,18 +185,18 @@ class MainActivity : AppCompatActivity() {
 
                     try {
 
-                        val data = WorkSheet.Builder(getApplicationContext(), file.name)
+                        val data = WorkSheet.Builder(applicationContext, file.name)
                             .title(CellEnum.TEAL_HEADER)
                             .header(CellEnum.FORMULA_1)
                             .cell(CellEnum.DEFAULT_CELL)
                             .setSheets(list)
                             .writeSheets()
                         //call the fileUload function to upload the wrist dev excels
-                        fileUpload(file, progressDialog,"excels")
-                        Log.i("file",data.getpath() + " : "+file.name)
+                        fileUpload(file, progressDialog, "excels")
+                        Log.i("file", data.getpath() + " : " + file.name)
 
                     } catch (e: IOException) {
-                        e.printStackTrace();
+                        e.printStackTrace()
                         cProgress.visibility = View.GONE
                     }
                 } else { //if we got no values yet (impossible we have initial values, something wrong with connectivity)
@@ -215,9 +205,9 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(applicationContext, "No Data available", Toast.LENGTH_LONG)
                         .show()
                 }
-            })
+            }
             //model with list of data for ankle dev we got from observer
-            mainViewModel.ankle.observe(this, androidx.lifecycle.Observer {
+            mainViewModel.ankle.observe(this) {
                 val list: List<Map<String, List<*>>> = it as List<Map<String, List<*>>>
                 if (list.size > 0) { //if there is at least one value sent from ankle dev
                     //check through FilesFunction object if excel was created for today
@@ -235,10 +225,10 @@ class MainActivity : AppCompatActivity() {
                             .setSheets(list)
                             .writeSheets()
                         //call fileUpload function to upload excel
-                        fileUpload(file, progressDialog,"excels")
-                        Log.i("file",data.getpath() + " : "+file.name)
+                        fileUpload(file, progressDialog, "excels")
+                        Log.i("file", data.getpath() + " : " + file.name)
                     } catch (e: IOException) {
-                        e.printStackTrace();
+                        e.printStackTrace()
                         cProgress.visibility = View.GONE
                     }
                 } else { // if no value has been sent from ankle dev
@@ -247,7 +237,7 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(applicationContext, "No Data available", Toast.LENGTH_LONG)
                         .show()
                 }
-            })
+            }
         }
     }
 
@@ -460,37 +450,37 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun fileUpload(file: File, progressDialog: ProgressDialog,type: String) {
+    private fun fileUpload(file: File, progressDialog: ProgressDialog, type: String) {
         val child = storageReference?.child(getTodayDate())
         val ref = child?.child(type+"/" + file.name)
         ref?.putFile(Uri.fromFile(file))
-            ?.addOnSuccessListener(OnSuccessListener<UploadTask.TaskSnapshot?> { // Image uploaded successfully
-            // Show message to user that File upload was successful
+            ?.addOnSuccessListener { // Image uploaded successfully
+                // Show message to user that File upload was successful
                 Toast.makeText(this@MainActivity, "File Uploaded!!", Toast.LENGTH_SHORT).show()
                 cProgress.visibility = View.GONE
                 progressDialog.dismiss()
-            })
-            ?.addOnFailureListener(OnFailureListener { e -> // Error, Image not uploaded
+            }
+            ?.addOnFailureListener { e -> // Error, Image not uploaded
                 // progressDialog.dismiss()
                 //Show message to user that File upload was not successful
                 Toast
-                    .makeText(this@MainActivity,"Failed " + e.message,Toast.LENGTH_SHORT
+                    .makeText(
+                        this@MainActivity, "Failed " + e.message, Toast.LENGTH_SHORT
                     )
                     .show()
                 cProgress.visibility = View.GONE
                 progressDialog.dismiss()
-            })
-            ?.addOnProgressListener(
-                OnProgressListener<UploadTask.TaskSnapshot> { taskSnapshot ->
+            }
+            ?.addOnProgressListener { taskSnapshot ->
 
-                    val p = (100.0
-                            * taskSnapshot.bytesTransferred
-                            / taskSnapshot.totalByteCount)
+                val p = (100.0
+                        * taskSnapshot.bytesTransferred
+                        / taskSnapshot.totalByteCount)
 
-                    cProgress.progress = p.roundToInt()
+                cProgress.progress = p.roundToInt()
 
-                    // progressDialog.setMessage("Uploaded " + p.toInt() + "%")
-                })
+                // progressDialog.setMessage("Uploaded " + p.toInt() + "%")
+            }
 
     }
 

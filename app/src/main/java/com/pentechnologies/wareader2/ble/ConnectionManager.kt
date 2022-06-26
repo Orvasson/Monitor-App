@@ -201,6 +201,7 @@ object ConnectionManager {
              //   Toast.makeText(ToastThis, "Something happened, we are disconnecting from Wrist Device", Toast.LENGTH_LONG).show()
              //   Toast.makeText(ToastThis, "Restart the MonitorAPP", Toast.LENGTH_LONG).show()
              //   testWrist = true
+                Toast.makeText(ToastThis, "Something happened, we are disconnecting from Wrist Device", Toast.LENGTH_LONG).show()
                 flagWrist = false
                 gatt.close()
                 deviceGattMap.remove(device)
